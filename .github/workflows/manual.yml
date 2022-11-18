@@ -1,0 +1,88 @@
+# This is a basic workflow that is manually triggered
+
+name: PortalRestAPIFunctionalTests
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        type: String
+        description: Cognity Branch or revision or tag to run tests from
+        default: 'master'
+        required: true
+      serverURL:
+        type: choice
+        description: AWS POSTGRE TESTS:http://api-testing.postgre-eu-central-1-stats-tests.analytics.rse.dev.eu-central-1.aws.fdscloud.io:8080/WebPortal/rest/
+        options: 
+        - http://api-testing.postgre-eu-central-1-stats-tests.analytics.rse.dev.eu-central-1.aws.fdscloud.io:8080/WebPortal/rest/
+        - http://api.ap-south-1-cognity-stats.analytics.rse.dev.ap-south-1.aws.fdscloud.io:8080/WebPortal/rest/
+        - http://api-testing.eu-central-1-cognity-stats-tests.analytics.rse.dev.eu-central-1.aws.fdscloud.io:8080/WebPortal/rest/
+        - https://hflp-cognity-api.hosting.factset.com/WebPortal/rest/
+        - https://hflu-cognity-api.hosting.factset.com/WebPortal/rest/
+        - https://dkbp-cognity-api.hosting.factset.com/WebPortal/rest/
+        - https://dkbu-cognity-api.hosting.factset.com/WebPortal/rest/
+        - https://dkbd-cognity-api.hosting.factset.com/WebPortal/rest/
+        - https://jdyp.hosting.factset.com/WebPortal/rest/
+        - https://hbwu-cognity-api.hosting.factset.com/WebPortal/rest/
+        required: true
+      user:
+        type: String
+        default: FactSet
+        required: true
+      password:
+        type: String
+        required: true
+      asOfDate:
+        type: choice
+        description: DEV:latestQuarterEnd CAPGROUP/HARTFORD/DEKA:2021-12-31
+        required: true
+        options:
+        - latestQuarterEnd
+        - latestMonthEnd
+        - "2021-12-31"
+        - "2019-09-30"
+      benchmarkId:
+        type: choice
+        default: Portal_SP50-USD_TR
+        required: true
+        options:
+        - "Portal_SP50-USD_TR"
+      groups:
+        type: String
+        default: DEV
+        required: true
+        description: For staging branch:DEV, DEKA, CAPGROUP, HARTFORD and valueCheck. For the other branches:generic,formatCheck,valueCheck,capgrooup. If you want to select more than one group, seperate them with comma.
+      folder:
+        type: choice
+        required: true
+        options:
+        - DEV
+        - DEKA
+        - HARTFORD
+        - CAPGROUP
+      verifyValues:  
+        type: boolean
+        required: true
+        default: true
+      fixedAsOfDate:
+        type: choice
+        required: true
+        description: DEV:2018-09-30 CAPGROUP/HARTFORD/DEKA:2021-12-31
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]      
+jobs:
+  build:
+    runs-on: [ self-hosted, ubuntu-latest ]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'corretto'
+    - name: Build with Ant
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+          echo $GITHUB_TOKEN
